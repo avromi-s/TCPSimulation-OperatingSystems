@@ -10,10 +10,7 @@ import javafx.concurrent.Task;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.stream.IntStream;
+import java.util.*;
 
 /**
  * This Task is responsible for sending a full message to a Client. The class is instantiated with the required
@@ -77,38 +74,44 @@ public class MessageSender extends Task<Boolean> {
                 boolean clientIsMissingPackets = (packet.containsArg(PacketArgKey.COMPLETED) && packet.getArg(PacketArgKey.COMPLETED).equals("F"));
                 boolean sendPackets = isFirstRequest || clientIsMissingPackets;
                 if (sendPackets) {
-                    int[] packetNumsToSend;
+                    ArrayList<Integer> packetNumsToSend = new ArrayList<>();
                     if (isFirstRequest) {
-                        packetNumsToSend = IntStream.range(0, messagePackets.size()).toArray();
+                        for (int i = 0; i < messagePackets.size(); i++) {
+                            packetNumsToSend.add(i);
+                        }
                     } else {
-                        packetNumsToSend = packet.getIntArrayArg(PacketArgKey.MISSING_PACKET_NUMS);
-                        if (packetNumsToSend == null) {
+                        int[] missingNums = packet.getIntArrayArg(PacketArgKey.MISSING_PACKET_NUMS);
+                        for (int num : missingNums) {
+                            packetNumsToSend.add(num);
+                        }
+                        if (packetNumsToSend.size() == 0) {
                             log("ERROR: unable to retrieve " + PacketArgKey.MISSING_PACKET_NUMS + " from packet");
                             continue;
                         }
                     }
 
                     // Send the packets...
-                    for (int i = 0; i < packetNumsToSend.length - 1; i++) {
+                    Collections.shuffle(packetNumsToSend);
+                    for (int i = 0; i < packetNumsToSend.size() - 1; i++) {
                         if (!SIMULATE_DROPPED_PACKETS || Math.random() >= PACKET_DROP_PROBABILITY) {
-                            clientOut.print(messagePackets.get(packetNumsToSend[i]));
+                            clientOut.print(messagePackets.get(packetNumsToSend.get(i)));
                             clientOut.flush();  // flush is required to ensure packet get sent
-                            log("sent packet '" + messagePackets.get(i) + "'");
+                            log("sent packet '" + messagePackets.get(packetNumsToSend.get(i)) + "'");
                         } else {
                             droppedPackets++;
                         }
                         packetsSent++;
-                        updateMessageAndProgress(packetsSent, (allPacketsEncoder.getNumTotalPackets() - packetNumsToSend.length), allPacketsEncoder.getNumTotalPackets());
+                        updateMessageAndProgress(packetsSent, (allPacketsEncoder.getNumTotalPackets() - packetNumsToSend.size()), allPacketsEncoder.getNumTotalPackets());
                     }
 
                     // (the last packet is never dropped)
-                    PacketEncoder lastPacket = messagePackets.get(packetNumsToSend[packetNumsToSend.length - 1]);
+                    PacketEncoder lastPacket = messagePackets.get(packetNumsToSend.get(packetNumsToSend.size() - 1));
                     lastPacket.setArg(PacketArgKey.COMPLETED, "T");
                     clientOut.print(lastPacket);
                     clientOut.flush();
                     log("sent packet '" + lastPacket + "'");
                     packetsSent++;
-                    updateMessageAndProgress(packetsSent, (allPacketsEncoder.getNumTotalPackets() - packetNumsToSend.length), allPacketsEncoder.getNumTotalPackets());
+                    updateMessageAndProgress(packetsSent, (allPacketsEncoder.getNumTotalPackets() - packetNumsToSend.size()), allPacketsEncoder.getNumTotalPackets());
                 } else {
                     updateMessageAndProgress(packetsSent, allPacketsEncoder.getNumTotalPackets(), allPacketsEncoder.getNumTotalPackets());
                     log("Message successfully sent.");

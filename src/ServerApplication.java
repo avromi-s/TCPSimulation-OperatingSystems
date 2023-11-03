@@ -3,7 +3,6 @@ package com.example.assignment4gui;
 
 import javafx.application.Application;
 import javafx.concurrent.WorkerStateEvent;
-import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

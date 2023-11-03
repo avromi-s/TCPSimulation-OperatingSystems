@@ -27,7 +27,7 @@ public class GUI {
     }
     private static FileChooser createFileChooser() {
         FileChooser fileChooser = new FileChooser();
-        fileChooser.setInitialDirectory(new File(System.getenv("USERPROFILE") + "/Downloads"));
+        fileChooser.setInitialDirectory(new File("C:/Users/jackt/Desktop/Files sent and received/Send")/* new File(System.getenv("USERPROFILE") + "/Downloads") */);
         return fileChooser;
     }
 
