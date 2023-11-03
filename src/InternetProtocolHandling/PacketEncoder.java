@@ -1,7 +1,8 @@
 // Avromi Schneierson - 11/3/2023
-package com.example.assignment4gui.InternetProtocolHandling;
+package src.InternetProtocolHandling;
 
-import com.example.assignment4gui.InternetProtocolHandling.enums.PacketArgKey;
+import src.InternetProtocolHandling.enums.PacketArgKey;
+
 import java.util.HashMap;
 
 /**
@@ -83,8 +84,9 @@ public class PacketEncoder {
 
     /**
      * Set the packet's message
+     *
      * @param message the String to set as this packet's message
-     * */
+     */
     public void setMessage(String message) {
         this.message.setLength(0);
         this.message.append(message);
@@ -100,7 +102,7 @@ public class PacketEncoder {
 
     /**
      * @return a String of this packet in the correct format for transmission
-     * */
+     */
     public String getPacketString() {
         StringBuilder packet = new StringBuilder();
         for (PacketArgKey key : args.keySet()) {

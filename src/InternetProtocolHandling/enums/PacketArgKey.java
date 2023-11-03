@@ -1,9 +1,9 @@
 // Avromi Schneierson - 11/3/2023
-package com.example.assignment4gui.InternetProtocolHandling.enums;
+package src.InternetProtocolHandling.enums;
 
 /**
  * The valid argument keys for a packet
- * */
+ */
 public enum PacketArgKey {
     REQUEST_TYPE,
     COMPLETED,

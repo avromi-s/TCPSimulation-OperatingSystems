@@ -1,7 +1,7 @@
 // Avromi Schneierson - 11/3/2023
-package com.example.assignment4gui.InternetProtocolHandling;
+package src.InternetProtocolHandling;
 
-import com.example.assignment4gui.InternetProtocolHandling.enums.PacketArgKey;
+import src.InternetProtocolHandling.enums.PacketArgKey;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -105,14 +105,14 @@ public class MultiPacketDecoder {
 
     /**
      * @return the sequence numbers of the packets missing that are needed to construct the larger message
-     * */
+     */
     public Set<Integer> getMissingPacketNumbers() {
         return (Set<Integer>) missingPackets.clone();
     }
 
     /**
      * @return The args for this decoder
-     * */
+     */
     public HashMap<String, String> getArgs() {
         return (HashMap<String, String>) args.clone();
     }

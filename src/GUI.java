@@ -1,17 +1,18 @@
 // Avromi Schneierson - 11/3/2023
-package com.example.assignment4gui;
+package src;
 
 import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
+
 import java.io.File;
 import java.util.List;
 
 /**
  * Provides convenience methods for handling GUI operations and setup
- * */
+ */
 public class GUI {
 
     private static ExtensionFilter allFilter = new ExtensionFilter("All Files", "*.txt", "*.csv");
@@ -25,6 +26,7 @@ public class GUI {
             textField.selectAll();
         });
     }
+
     private static FileChooser createFileChooser() {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File("C:/Users/jackt/Desktop/Files sent and received/Send")/* new File(System.getenv("USERPROFILE") + "/Downloads") */);

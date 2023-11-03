@@ -1,5 +1,5 @@
 // Avromi Schneierson - 11/3/2023
-package com.example.assignment4gui;
+package src;
 
 import javafx.application.Application;
 import javafx.concurrent.WorkerStateEvent;
@@ -113,6 +113,7 @@ public class ServerApplication extends Application {
             if (messageSenderTask != null && messageSenderTask.isRunning()) {
                 messageSenderTask.cancel();
             }
+
         });
 
         HBox fileSelectionBox = new HBox(STAGE_PADDING * 2);

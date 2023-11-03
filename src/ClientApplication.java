@@ -1,5 +1,5 @@
 // Avromi Schneierson - 11/3/2023
-package com.example.assignment4gui;
+package src;
 
 import javafx.application.Application;
 import javafx.concurrent.WorkerStateEvent;
@@ -17,14 +17,14 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
 import java.io.File;
 import java.io.FileWriter;
-import static com.example.assignment4gui.GUI.*;
 
 /**
  * The GUI application for the Client. This class is responsible for setting up the Client GUI and managing the MessageReceiver
  * task based on user input to the GUI.
- * */
+ */
 public class ClientApplication extends Application {
     private final int WINDOW_WIDTH = 330;
     private final int WINDOW_HEIGHT = 275;
@@ -49,7 +49,7 @@ public class ClientApplication extends Application {
         this.primaryStage = stage;
         Label ipLabel = new Label("IP Address:");
         ipField = new TextField("127.0.0.1");
-        linkLabelToTextField(ipLabel, ipField);
+        GUI.linkLabelToTextField(ipLabel, ipField);
         connectButton = new Button("Receive File");
         progressBar = new ProgressBar();
         progressBar.setPrefWidth(215);
@@ -172,7 +172,7 @@ public class ClientApplication extends Application {
      */
     private File getFileToSaveAs(Label resultLabel) {
         File fileToSaveAs;
-        FileChooser fileChooser = createSaveFileChooser();
+        FileChooser fileChooser = GUI.createSaveFileChooser();
         fileToSaveAs = fileChooser.showSaveDialog(ClientApplication.this.primaryStage);
         if (fileToSaveAs == null) {
             resultLabel.setText("No path selected - file not saved");

@@ -1,11 +1,12 @@
 // Avromi Schneierson - 11/3/2023
-package com.example.assignment4gui;
+package src;
 
-import com.example.assignment4gui.InternetProtocolHandling.MultiPacketDecoder;
-import com.example.assignment4gui.InternetProtocolHandling.PacketDecoder;
-import com.example.assignment4gui.InternetProtocolHandling.PacketEncoder;
-import com.example.assignment4gui.InternetProtocolHandling.enums.PacketArgKey;
+import src.InternetProtocolHandling.MultiPacketDecoder;
+import src.InternetProtocolHandling.PacketDecoder;
+import src.InternetProtocolHandling.PacketEncoder;
+import src.InternetProtocolHandling.enums.PacketArgKey;
 import javafx.concurrent.Task;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.Arrays;
@@ -19,17 +20,17 @@ import java.util.HashSet;
 public class MessageReceiver extends Task<String> {
     private final String ip;
     private final int portNumber;
-    
+
     public MessageReceiver(String ip, int portNumber) {
         this.ip = ip;
         this.portNumber = portNumber;
     }
-    
+
     /**
      * Connect to the server and receive a message. Upon fully receiving the message, this method returns and sets this
      * Task's value to the received message.
      * <p>
-     *     This method does the following:
+     * This method does the following:
      *     <ul>
      *         <li>creates a socket and waits for the server to connect</li>
      *         <li>upon connecting to the server, sends the initial message request packet</li>
@@ -40,8 +41,9 @@ public class MessageReceiver extends Task<String> {
      *         final packet indicating success to the server and terminates</li>
      *     </ul>
      * </p>
+     *
      * @return the message received from the server, or null if a message wasn't received or an error occurred
-     * */
+     */
     @Override
     protected String call() {
         PacketEncoder packetEncoder = new PacketEncoder();

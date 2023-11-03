@@ -1,7 +1,7 @@
 // Avromi Schneierson - 11/3/2023
-package com.example.assignment4gui.InternetProtocolHandling;
+package src.InternetProtocolHandling;
 
-import com.example.assignment4gui.InternetProtocolHandling.enums.PacketArgKey;
+import src.InternetProtocolHandling.enums.PacketArgKey;
 
 import java.util.HashMap;
 

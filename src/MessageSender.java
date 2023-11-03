@@ -1,15 +1,16 @@
 // Avromi Schneierson - 11/3/2023
-package com.example.assignment4gui;
+package src;
 
-import com.example.assignment4gui.InternetProtocolHandling.MultiPacketEncoder;
-import com.example.assignment4gui.InternetProtocolHandling.PacketDecoder;
-import com.example.assignment4gui.InternetProtocolHandling.PacketEncoder;
-import com.example.assignment4gui.InternetProtocolHandling.enums.PacketArgKey;
+import src.InternetProtocolHandling.MultiPacketEncoder;
+import src.InternetProtocolHandling.PacketDecoder;
+import src.InternetProtocolHandling.PacketEncoder;
+import src.InternetProtocolHandling.enums.PacketArgKey;
 import javafx.concurrent.Task;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.util.*;
 
 /**
@@ -19,6 +20,7 @@ import java.util.*;
 public class MessageSender extends Task<Boolean> {
     private final boolean SIMULATE_DROPPED_PACKETS = true;
     private final float PACKET_DROP_PROBABILITY = 0.2f;
+    private final int maxWaitBeforeSocketTimeout = 60000;
     private final int portNumber;
     private final String messageContent;
 
@@ -53,10 +55,21 @@ public class MessageSender extends Task<Boolean> {
         log("waiting for client to connect...");
         try (
                 ServerSocket serverSocket = new ServerSocket(portNumber);
-                Socket client = serverSocket.accept();
-                PrintWriter clientOut = new PrintWriter(client.getOutputStream(), true);
-                BufferedReader clientIn = new BufferedReader(new InputStreamReader(client.getInputStream()));
         ) {
+            serverSocket.setSoTimeout(maxWaitBeforeSocketTimeout);
+            Socket clientSocket;
+            try {
+                clientSocket = serverSocket.accept();
+                updateMessage("Client connected");
+                log("client connected");
+            } catch (SocketTimeoutException e) {
+                updateMessage("Server timed out while waiting for client connection for " + maxWaitBeforeSocketTimeout + "ms");
+                log("Server timed out while waiting for client connection for " + maxWaitBeforeSocketTimeout + "ms");
+                return false;
+            }
+            PrintWriter clientOut = new PrintWriter(clientSocket.getOutputStream(), true);
+            BufferedReader clientIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+
             updateMessage("Client connected");
             log("client connected");
             int characterVal;
