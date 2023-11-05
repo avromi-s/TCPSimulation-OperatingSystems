@@ -51,10 +51,10 @@ The protocol for communication is described below:
                 -   Set to `T` or `F`
             -   `TOTAL_PACKETS_MISSING` – the number of packets missing
                 -   Set to a number
-                -   only included if `COMPLETED` is set to `T`
+                -   only included if `COMPLETED` is set to `F`
             -   `MISSING_PACKET_NUMS` – the list of the sequence numbers of the missing packets
                 -   Set to the missing sequence numbers enclosed in square brackets `[]`, separated by commas, in any order
-                -   only included if `COMPLETED` is set to `T`
+                -   only included if `COMPLETED` is set to `F`
             -   This is followed by a newline character to indicate the end of the header and packet
             -   Examples:
                 -   `(12)COMPLETED:T\n`
