@@ -32,7 +32,7 @@ The protocol for communication is described below:
     -   The server packet message (excluding headers) is limited to a size of 100 characters
         -   The arguments are:
             -   `COMPLETED` - whether the sending of packets is completed or not
-                -   Set to `T` (when sending the last packet on this run) or `F` (for any other packet)
+                -   Set to `T` or `F`
             -   `TOTAL_PACKETS` - the total number of packets
                 -   Set to a number
             -   `SEQUENCE_NUM` - the sequence number of the current packet, starting from 0
