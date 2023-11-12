@@ -67,84 +67,86 @@ public class MessageSender extends Task<Boolean> {
                 log("Server timed out while waiting for client connection for " + maxWaitBeforeSocketTimeout + "ms");
                 return false;
             }
-            PrintWriter clientOut = new PrintWriter(clientSocket.getOutputStream(), true);
-            BufferedReader clientIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
-            updateMessage("Client connected");
-            log("client connected");
-            int characterVal;
-            // Wait for and then process the client's packet with either a request or confirmation of message receipt
-            while ((characterVal = clientIn.read()) != -1 && !isCancelled()) {
-                PacketDecoder packet = new PacketDecoder(String.valueOf((char) characterVal));
-                log("receiving packet...");
-                while (!packet.isComplete()) {
-                    packet.appendToPacketString(String.valueOf((char) clientIn.read()));
-                }
-                log("RECEIVED: '" + packet.getPacketString() + "'");
-
-                // After receiving the client packet, check what the client wants and reply accordingly:
-                boolean isFirstRequest = (packet.containsArg(PacketArgKey.REQUEST_TYPE) && packet.getArg(PacketArgKey.REQUEST_TYPE).equals("MESSAGE"));
-                boolean clientIsMissingPackets = (packet.containsArg(PacketArgKey.COMPLETED) && packet.getArg(PacketArgKey.COMPLETED).equals("F"));
-                boolean sendPackets = isFirstRequest || clientIsMissingPackets;
-                if (sendPackets) {
-                    ArrayList<Integer> packetNumsToSend = new ArrayList<>();
-                    if (isFirstRequest) {
-                        for (int i = 0; i < messagePackets.size(); i++) {
-                            packetNumsToSend.add(i);
-                        }
-                    } else {
-                        int[] missingNums = packet.getIntArrayArg(PacketArgKey.MISSING_PACKET_NUMS);
-                        for (int num : missingNums) {
-                            packetNumsToSend.add(num);
-                        }
-                        if (packetNumsToSend.size() == 0) {
-                            log("ERROR: unable to retrieve " + PacketArgKey.MISSING_PACKET_NUMS + " from packet");
-                            continue;
-                        }
+            try (PrintWriter clientOut = new PrintWriter(clientSocket.getOutputStream(), true);
+                 BufferedReader clientIn = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));) {
+                updateMessage("Client connected");
+                log("client connected");
+                int characterVal;
+                // Wait for and then process the client's packet with either a request or confirmation of message receipt
+                while ((characterVal = clientIn.read()) != -1 && !isCancelled()) {
+                    PacketDecoder packet = new PacketDecoder(String.valueOf((char) characterVal));
+                    log("receiving packet...");
+                    while (!packet.isComplete()) {
+                        packet.appendToPacketString(String.valueOf((char) clientIn.read()));
                     }
+                    log("RECEIVED: '" + packet.getPacketString() + "'");
 
-                    // Send the packets...
-                    Collections.shuffle(packetNumsToSend);
-                    for (int i = 0; i < packetNumsToSend.size() - 1; i++) {
-                        if (!SIMULATE_DROPPED_PACKETS || Math.random() >= PACKET_DROP_PROBABILITY) {
-                            clientOut.print(messagePackets.get(packetNumsToSend.get(i)));
-                            clientOut.flush();  // flush is required to ensure packet get sent
-                            log("sent packet '" + messagePackets.get(packetNumsToSend.get(i)) + "'");
+                    // After receiving the client packet, check what the client wants and reply accordingly:
+                    boolean isFirstRequest = (packet.containsArg(PacketArgKey.REQUEST_TYPE) && packet.getArg(PacketArgKey.REQUEST_TYPE).equals("MESSAGE"));
+                    boolean clientIsMissingPackets = (packet.containsArg(PacketArgKey.COMPLETED) && packet.getArg(PacketArgKey.COMPLETED).equals("F"));
+                    boolean sendPackets = isFirstRequest || clientIsMissingPackets;
+                    if (sendPackets) {
+                        ArrayList<Integer> packetNumsToSend = new ArrayList<>();
+                        if (isFirstRequest) {
+                            for (int i = 0; i < messagePackets.size(); i++) {
+                                packetNumsToSend.add(i);
+                            }
                         } else {
-                            droppedPackets++;
+                            int[] missingNums = packet.getIntArrayArg(PacketArgKey.MISSING_PACKET_NUMS);
+                            for (int num : missingNums) {
+                                packetNumsToSend.add(num);
+                            }
+                            if (packetNumsToSend.size() == 0) {
+                                log("ERROR: unable to retrieve " + PacketArgKey.MISSING_PACKET_NUMS + " from packet");
+                                continue;
+                            }
                         }
+
+                        // Send the packets...
+                        if (SIMULATE_DROPPED_PACKETS) Collections.shuffle(packetNumsToSend);
+                        for (int i = 0; i < packetNumsToSend.size() - 1; i++) {
+                            if (!SIMULATE_DROPPED_PACKETS || Math.random() >= PACKET_DROP_PROBABILITY) {
+                                clientOut.print(messagePackets.get(packetNumsToSend.get(i)));
+                                clientOut.flush();  // flush is required to ensure packet get sent
+                                log("sent packet '" + messagePackets.get(packetNumsToSend.get(i)) + "'");
+                            } else {
+                                droppedPackets++;
+                            }
+                            packetsSent++;
+                            updateMessageAndProgress(packetsSent, (allPacketsEncoder.getNumTotalPackets() - packetNumsToSend.size()), allPacketsEncoder.getNumTotalPackets());
+                        }
+
+                        // (the last packet is never dropped)
+                        PacketEncoder lastPacket = messagePackets.get(packetNumsToSend.get(packetNumsToSend.size() - 1));
+                        lastPacket.setArg(PacketArgKey.COMPLETED, "T");
+                        clientOut.print(lastPacket);
+                        clientOut.flush();
+                        log("sent packet '" + lastPacket + "'");
                         packetsSent++;
                         updateMessageAndProgress(packetsSent, (allPacketsEncoder.getNumTotalPackets() - packetNumsToSend.size()), allPacketsEncoder.getNumTotalPackets());
+                    } else {
+                        updateMessageAndProgress(packetsSent, allPacketsEncoder.getNumTotalPackets(), allPacketsEncoder.getNumTotalPackets());
+                        log("Message successfully sent.");
+                        log("total packets sent: " + packetsSent + "\npackets 'dropped': " + droppedPackets + "\npackets not dropped: " + (packetsSent - droppedPackets));
+                        return true;
                     }
-
-                    // (the last packet is never dropped)
-                    PacketEncoder lastPacket = messagePackets.get(packetNumsToSend.get(packetNumsToSend.size() - 1));
-                    lastPacket.setArg(PacketArgKey.COMPLETED, "T");
-                    clientOut.print(lastPacket);
-                    clientOut.flush();
-                    log("sent packet '" + lastPacket + "'");
-                    packetsSent++;
-                    updateMessageAndProgress(packetsSent, (allPacketsEncoder.getNumTotalPackets() - packetNumsToSend.size()), allPacketsEncoder.getNumTotalPackets());
-                } else {
-                    updateMessageAndProgress(packetsSent, allPacketsEncoder.getNumTotalPackets(), allPacketsEncoder.getNumTotalPackets());
-                    log("Message successfully sent.");
-                    log("total packets sent: " + packetsSent + "\npackets 'dropped': " + droppedPackets + "\npackets not dropped: " + (packetsSent - droppedPackets));
-                    return true;
                 }
+                // If the input stream is closed that means we stopped receiving messages from the client
+                if (isCancelled()) {
+                    updateMessage("Task cancelled - message not sent");
+                    log("task cancelled - message not sent");
+                } else {
+                    updateMessage("Lost connection to the client - message not sent");
+                    log("lost connection to the client - message not sent");
+                }
+                return false;
             }
-            // If the input stream is closed that means we stopped receiving messages from the client
-            if (isCancelled()) {
-                updateMessage("Task cancelled - message not sent");
-                log("task cancelled - message not sent");
-            } else {
-                updateMessage("Lost connection to the client - message not sent");
-                log("lost connection to the client - message not sent");
-            }
-            return false;
-        } catch (IOException e) {
+        } catch (IOException | SecurityException | IllegalArgumentException e) {
             updateMessage("Connection error");
             log("EXCEPTION: exception while listening on port " + portNumber + " or listening for a connection");
-            System.out.println(e.getMessage() + "\n" + Arrays.toString(e.getStackTrace()));
+            System.out.println(e.getMessage() + "\n");
+            e.printStackTrace();
             return false;
         }
     }
