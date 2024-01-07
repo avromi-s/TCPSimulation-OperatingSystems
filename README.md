@@ -9,7 +9,7 @@
     -   If you are running both applications on the same computer, use `127.0.0.1`
     -   If the applications are running on different networks, port forwarding will need to be configured on the *Server* application's network to forward all incoming traffic for port `30121` to the local machine that is running the Server application
 -   Click the 'Receive File' button on the Client Application
--   After a file is finished sending (successfully or not), additional files can be sent in the same manner
+-   After a file is finished sending, additional files can be sent in the same manner
 
 ***
 
