@@ -1,25 +1,29 @@
-# OperatingSystems-TCPSimulation
+# TCPSimulation
 
-This program simulates communication between a Server and Client using a TCP-like protocol. 
--   The Server application allows selection of a .csv or .txt file by the user. Once a file is selected and the "Send file once connection is established" checkbox is selected, the Server application launches a background task to send the file selected to a Client
--   The Client application allows the user to specify an IPv4 address to connect to, and once the user clicks the "Receive File" button, attempts to connect and receive a file from a Server application at that IP
+#### This project simulates communication between a Server and Client using a TCP-like protocol. 
+
+### To run the simulation:
+-   Download and install the Server and Client application .exe's (found in the releases) onto the same or separate computers
+-   On the Server application, select a local file and check off the 'Send file once connection is established' checkbox
+-   On the Client application, enter the IP address where the Server application is running:
+    -   If you are running both applications on the same computer, use `127.0.0.1`
+    -   If the applications are running on different networks, port forwarding will need to be configured on the *Server* application's network to forward all incoming traffic for port `30121` to the local machine that is running the Server application
+-   Click the 'Receive File' button on the Client Application
 -   After a file is finished sending (successfully or not), additional files can be sent in the same manner
 
-The Server application and Client application are intended to be ran independently of each other. 
 ***
-The protocol for communication is described below:
 
-Protocol Description
--   The protocol allows packets to arrive out of order and recover from lost packets as follows:
-    1.  The message is broken down into 100-character-length packets (excluding headers) with the number of packets depending on the size of the message
-    2.  The server sends all of the packets once to the client, finishing with the last packet which indicates that it is such in the header
-    3.  Upon receival of the last packet, the client sends a message back to the server either indicating that all packets were successfully received, or that it is missing some packets
-        -  If packets are missing, the client indicates the number of packets missing and their sequence numbers
-        -  The server then sends again (only) the indicated packets, again indicating the last packet when it is sent
-        -  The protocol continues from step 3 again
-        -  For the purposes of this simulation, we guarantee that the last packet send from the server is always received by the client
+### Protocol Description
+The protocol allows packets to arrive out of order and recover from lost packets as follows:
+1.  The message is broken down into 100-character-length packets (excluding headers) with the number of packets depending on the size of the message
+2.  The server sends all of the packets once to the client, finishing with the last packet which indicates that it is such in the header
+3.  Upon receival of the last packet, the client sends a message back to the server either indicating that all packets were successfully received, or that it is missing some packets
+    -  If packets are missing, the client indicates the number of packets missing and their sequence numbers
+    -  The server then sends again (only) the indicated packets, again indicating the last packet when it is sent
+    -  The protocol continues from step 3 again
+    -  For the purposes of this simulation, we guarantee that the last packet send from the server is always received by the client
 
-Packet Structure
+#### Packet Structure
 -   Syntax
     -   Packets contain a header and a message section. The header contains key-value pairs as arguments; the message section contains the actual content being transmitted, which is a portion of the larger file/message being transmitted
     -   All packets start with a length indicator that gives the length of the packet contents (including the headers) enclosed in parentheses. The length of the indicator itself is not included in the calculated length
