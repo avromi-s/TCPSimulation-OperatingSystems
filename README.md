@@ -1,6 +1,6 @@
 # TCPSimulation
 
-#### This project simulates communication between a Server and Client using a TCP-like protocol. 
+This project simulates communication between a Server and a Client using a TCP-like protocol. Once a connection is established, the Server sends a file to the Client in a sequence of packets. For the simulation, we 'drop' ~20% of packets sent by the server and rely on the protocol to recover from this so that the complete file is successfully received.
 
 ### To run the simulation:
 -   Download and install the Server and Client application .exe's (found in the releases) onto the same or separate computers
