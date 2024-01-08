@@ -20,8 +20,8 @@ The protocol allows packets to arrive out of order and recover from lost packets
 3.  Upon receival of the last packet, the client sends a message back to the server either indicating that all packets were successfully received, or that it is missing some packets
     -  If packets are missing, the client indicates the number of packets missing and their sequence numbers
     -  The server then sends again (only) the indicated packets, again indicating the last packet when it is sent
-    -  The protocol continues from step 3 again
-    -  For the purposes of this simulation, we guarantee that the last packet send from the server is always received by the client
+    -  The protocol continues from step 3 again until the full message is received
+    -  For the purposes of this simulation, we guarantee that the last packet sent from the server is always received by the client
 
 #### Packet Structure
 -   Syntax
