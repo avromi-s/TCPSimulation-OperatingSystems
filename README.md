@@ -1,10 +1,12 @@
 # TCP Simulation
 
-This project simulates communication between a __server__ and a __client__ using a TCP-like protocol. Once a connection is established, the server sends a file to the client in a sequence of packets. For the simulation, we 'drop' ~20% of packets sent by the server and rely on the protocol to recover from this so that the complete file is successfully received.
+This project simulates communication between a __server__ and a __client__ using a TCP-like protocol (the custom protocol is meant to incorporate the core benefits provided by TCP, but is not meant to fully emulate it).
+
+Once a connection is established, the server sends a file to the client in a sequence of packets. For the simulation, we 'drop' ~20% of packets sent by the server and rely on the protocol to recover from this so that the complete file is successfully received.
 
 The details of the custom protocol are described [here](https://github.com/avromi-s/TCPSimulation-OperatingSystems/blob/main/protocol-description.md).
 
-### To run the simulation:
+## To run the simulation:
 -   Download and install the server and client applications (found in the [releases](https://github.com/avromi-s/TCPSimulation-OperatingSystems/releases); alternatively, you can build it from source)
     -   they can be installed on the same or separate computers
 -   On the server application, select a local file and check off the 'Send file once connection is established' checkbox
