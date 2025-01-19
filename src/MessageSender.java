@@ -154,7 +154,7 @@ public class MessageSender extends Task<Boolean> {
     private void updateMessageAndProgress(int packetsSent, int packetsReceived, int totalPackets) {
         updateProgress(packetsReceived, totalPackets);
         updateMessage("Packets sent: " + packetsSent + " - Packets received: " + packetsReceived + " out of " +
-                totalPackets + " total packets...\nPacket loss: " +
+                totalPackets + " total packets...\nPacket retransmissions: " +
                 String.format("%.0f", ((packetsSent - packetsReceived) * 100) / (float) packetsSent) + "%");
     }
 
